@@ -23,6 +23,7 @@ dependencies:
   back_button_interceptor: ^7.0.3
   firebase_messaging: ^14.8.2
   shared_preferences: ^2.2.3
+  flutter_local_notifications: ^17.1.0
 
 dev_dependencies:
   flutter_test:
