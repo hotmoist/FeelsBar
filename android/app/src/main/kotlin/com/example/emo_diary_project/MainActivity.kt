@@ -122,7 +122,7 @@ class MainActivity: FlutterFragmentActivity() {
                         fetchData += getAppNameJsoup(
                             us.packageName,
                             context
-                        ) + "|" + category + "|" + us.totalTimeInForeground + "\n"
+                        ) + "|" + category + "|" + ((us.totalTimeInForeground / 1000).toInt()) + "\n"
                     }
                 }
 
@@ -235,8 +235,8 @@ class MainActivity: FlutterFragmentActivity() {
                     async { requestPermissions.launch(PERMISSIONS)}.await()
                 }
 
-//                if(granted.containsAll(PERMISSIONS)){
                     val endTime = Instant.now()
+                    val timeZone = ZoneId.of("Asia/Seoul")
                     // 현재 로컬 날짜 및 시간으로 변환 (예 시스템 기본 시간대를 사용)
                     val currentLocalDateTime = endTime.atZone(ZoneId.systemDefault())
                     // 오늘 자정의 로컬 날짜 및 시간
@@ -247,14 +247,19 @@ class MainActivity: FlutterFragmentActivity() {
                     val sleepData = healthConnectClient.readRecords(
                         ReadRecordsRequest(
                             recordType = androidx.health.connect.client.records.SleepSessionRecord::class,
-                            timeRangeFilter = TimeRangeFilter.Companion.between(Instant.now().minus(Duration.ofDays(7)), Instant.now())
+                            timeRangeFilter = TimeRangeFilter.Companion.between(Instant.now().minus(Duration.ofDays(1)), Instant.now())
                         )
                     )
+//                    val sleepStages = sleepData.records.filterIsInstance<androidx.health.connect.client.records.SleepSessionRecord>()
+//                    val sleepStageStrings = sleepStages.map { "${it.startTime} to ${it.endTime}" }
                     val sleepStages = sleepData.records.filterIsInstance<androidx.health.connect.client.records.SleepSessionRecord>()
-                    val sleepStageStrings = sleepStages.map { "${it.startTime} to ${it.endTime}" }
+                    val sleepStageStrings = sleepStages.map {
+                        val localStart = it.startTime.atZone(timeZone).toString().substringBefore('+')
+                        val localEnd = it.endTime.atZone(timeZone).toString().substringBefore("+")
+                        "$localStart to $localEnd"
+                    }.lastOrNull()
 
                     result.success(sleepStageStrings.toString())
-//                }
             } catch (e :Exception){
                 withContext(Dispatchers.Main){
                     result.error("ERROR_FETCHING_DATA", e.message, null)
@@ -297,7 +302,7 @@ class MainActivity: FlutterFragmentActivity() {
                     val stepCount = response[androidx.health.connect.client.records.StepsRecord.COUNT_TOTAL]
 
                     withContext(Dispatchers.Main){
-                        result.success("step count: " + stepCount) // 데이터 전달에 대해 수정 필요
+                        result.success(stepCount.toString()) // 데이터 전달에 대해 수정 필요
                     }
 //                }else{
 //                    requestPermissions.launch(PERMISSIONS)
