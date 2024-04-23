@@ -3,14 +3,23 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class GPTResponse {
-  final apiKey = 'API KEY here';
+  final apiKey = 'API_Key_HERE';
   final url = Uri.parse("https://api.openai.com/v1/chat/completions");
 
-  Future<String> fetchGPTPromptResponse(String sensorValue) async {
-    String prompt = "사용자의 하루 평균 걸음 수: 1000보 / 사용자의 오늘 걸음 수: 340보"; // test
+  Future<String> fetchGPTPromptResponse(
+      Map profileData, String stepCount, String appUsage, String sleep) async {
+    String loggedSleepTime =
+        sleep.substring(sleep.indexOf('T') + 1, sleep.indexOf(' to'));
+    String loggedWakeTime = sleep.substring(sleep.lastIndexOf('T') + 1);
+    String prompt =
+        "[데이터]\n데이터 1 : 평균 걸음 수 = ${profileData['steps']} | 오늘 걸음 수 = $stepCount\n데이터 2 : 평소 취침 시각 = ${profileData['sleepTime']} | 기록된 취침 시간: $loggedSleepTime\n데이터 3 : 평소 기상 시각 = ${profileData['wakeTime']} | 기록된 기상 시각: $loggedWakeTime\n데이터 4 : 금일 가장 많이 사용한 어플: \"Youtube\"(카테고리: \"VIDEO_PLAYER\", 사용시간: 3652초)"; // test
     // test
     String systemRole =
-        "당신은 제공된 정보를 통해 사용자의 상태를 유추하고 일기 작성을 위한 작성 유도 문구를 제작하는 역할을 한다. 이때 문장은 2문장을 초과하지 않는다";
+        "[역할]\n당신은 제공된 데이터 1, 데이터 2, 데이터 3, 데이터 4 중 하나를 선택해서 사용자의 심리 상태를 유추한다. 유추 후, 일기 작성을 위한 작성 유도 문구를 제작하는 역할을 한다.\n\n[출력 조건]\n유도 문구만 출력한다.\n이때 문장은 3문장을 초과하지 않는다\n\n[출력 예시]\n\"오늘은 평소보다 많이 잤네요. 개운한 하루를 보내었나요? 당신의 이야기를 들려주세요.\"";
+
+    print(prompt);
+    print(systemRole);
+
     try {
       final response = await http.post(
         url,
@@ -74,13 +83,13 @@ class GPTResponse {
           }));
       if (response.statusCode == 200) {
         var data = json.decode(utf8.decode(response.bodyBytes));
-        // var text = data['choices'][0]['message']['content'].trim();
-        // print(text);
+        var text = data['choices'][0]['message']['content'].trim();
+        print(text);
         return data['choices'][0]['message']['content']
             .trim()
             .replaceAll(RegExp(r'^"|"$'), '');
       } else {
-        // print('Error: ${response.statusCode} ${response.body}');
+        print('Error: ${response.statusCode} ${response.body}');
         return "Failed to load data from OpenAI";
       }
     } catch (e) {

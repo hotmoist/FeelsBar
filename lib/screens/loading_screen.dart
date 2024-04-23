@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import './main_screen.dart';
 
@@ -19,6 +20,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   late String stepcount;
   late String appUsage;
   late String sleep;
+  late Map profileData;
   late String journalingPrompt = "no prompt";
 
   Future<void> _loadData() async {
@@ -26,12 +28,19 @@ class _LoadingScreenState extends State<LoadingScreen> {
     appUsage = await _getAppData();
     stepcount = await _getStepData();
     sleep = await _getSleepData();
+    profileData = await _getProfileData();
 
-    print(await FirebaseMessaging.instance.getToken());
+    // print(await FirebaseMessaging.instance.getToken());
     print(appUsage);
     print("step count: $stepcount");
     print("sleep data: $sleep");
-    journalingPrompt = await GPTResponse().fetchGPTPromptResponse(stepcount);
+    print("name: ${profileData['name']}");
+    print("steps: ${profileData['steps']}");
+    print("sleepTime: ${profileData['sleepTime']}");
+    print("wakeTime: ${profileData['wakeTime']}");
+
+    journalingPrompt = await GPTResponse()
+        .fetchGPTPromptResponse(profileData, stepcount, appUsage, sleep);
   }
 
   Future<void> _firebaseInit() async {
@@ -64,11 +73,21 @@ class _LoadingScreenState extends State<LoadingScreen> {
     try {
       final String result =
           await LoadingScreen.platform.invokeMethod("getUsageData");
-      print(result);
+      // print(result);
       return result;
     } on PlatformException catch (e) {
       return "Failed to get app data '${e.message}";
     }
+  }
+
+  Future<Map> _getProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    Map data = {};
+    data['name'] = prefs.get('name');
+    data['steps'] = prefs.get('steps');
+    data['sleepTime'] = prefs.get('sleepTime');
+    data['wakeTime'] = prefs.get('wakeTime');
+    return data;
   }
 
   @override
@@ -87,7 +106,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
                 children: [
                   CircularProgressIndicator(),
                   Padding(
-                      padding: EdgeInsets.all(8.0), child: Text("LOADING..."))
+                      padding: EdgeInsets.all(8.0),
+                      child: Text("에이전트가 당신을 스스슥슈슉..."))
                 ],
               ),
             );
