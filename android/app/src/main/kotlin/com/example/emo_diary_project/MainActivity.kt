@@ -1,6 +1,7 @@
 package com.example.emo_diary_project
 
 import android.app.AppOpsManager
+import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
@@ -29,7 +30,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
@@ -38,6 +38,10 @@ import java.util.Calendar
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
+import kotlin.Exception
 
 class MainActivity: FlutterFragmentActivity() {
     private val CHANNEL = "com.example.emo_diary_project/data"
@@ -96,48 +100,153 @@ class MainActivity: FlutterFragmentActivity() {
         }
     }
 
-
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun fetchAppUsageStats(context: Context, result: MethodChannel.Result){
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                val usageStateManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
                 var fetchData = ""
-                val usageStatsManager =
-                    context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
 
                 val calendar = Calendar.getInstance()
                 val endTime = calendar.timeInMillis
+
                 calendar.set(Calendar.HOUR_OF_DAY, 0)
                 calendar.set(Calendar.MINUTE, 0)
                 calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+
                 val startTime = calendar.timeInMillis
 
-                val queryUsageStats = usageStatsManager.queryUsageStats(
-                    UsageStatsManager.INTERVAL_DAILY, startTime, endTime
-                )
+                val queryEvents = usageStateManager.queryEvents(startTime, endTime)
+                val events = UsageEvents.Event()
+                val appUsageMap = mutableMapOf<String, AppUsageInfo>()
 
-                for (us in queryUsageStats) {
-                    if (us.totalTimeInForeground > 0) {
-                        val category = getCategory(us.packageName, context)
-                        fetchData += getAppNameJsoup(
-                            us.packageName,
-                            context
-                        ) + "|" + category + "|" + ((us.totalTimeInForeground / 1000).toInt()) + "\n"
+                while (queryEvents.hasNextEvent()){
+                    queryEvents.getNextEvent(events)
+                    if(events.eventType == UsageEvents.Event.MOVE_TO_FOREGROUND || events.eventType == UsageEvents.Event.MOVE_TO_BACKGROUND){
+                        val packageName = events.packageName
+                        appUsageMap.putIfAbsent(packageName, AppUsageInfo(packageName))
+                        val appUsageInfo = appUsageMap[packageName]
+                        if (events.eventType == UsageEvents.Event.MOVE_TO_FOREGROUND) {
+                            appUsageInfo?.lastTimeUsed = events.timeStamp
+                        } else if (events.eventType == UsageEvents.Event.MOVE_TO_BACKGROUND && appUsageInfo?.lastTimeUsed != 0L) {
+                            appUsageInfo?.addUsage(appUsageInfo.lastTimeUsed, events.timeStamp)
+                        }
                     }
                 }
+                fetchData = formatAppUsageStats(appUsageMap, context)
 
                 withContext(Dispatchers.Main) {
                     result.success(
                         fetchData
                     )
                 }
-            } catch (e: Exception){
+            }catch (e: Exception){
                 withContext(Dispatchers.Main){
                     result.error("ERROR_FETCHING_DATA", e.message, null)
                 }
             }
         }
     }
+
+    fun formatAppUsageStats(appUsageMap: Map<String, AppUsageInfo>, context: Context): String {
+        val stringBuilder = StringBuilder()
+        val sortedUsageStats = sortAppUsageByTime(appUsageMap)
+
+        for (entry in sortedUsageStats){
+            val packageName = entry.key
+            val appName = getAppNameJsoup(packageName, context)
+            val category = getCategory(packageName, context)
+            val usageTimeSeconds = entry.value.totalTimeInForeground / 1000
+            val usageTimeMinutes = usageTimeSeconds / 60
+            val seconds = usageTimeSeconds % 60
+            stringBuilder.append("$appName | $category | $usageTimeMinutes minutes $seconds seconds\n")
+        }
+
+//        for ((packageName, usageInfo) in appUsageMap) {
+//            val appName = getAppNameJsoup(packageName, context)
+//            val category = getCategory(packageName, context)
+//            val usageTimeSeconds = usageInfo.totalTimeInForeground / 1000
+//            val usageTimeMinutes = usageTimeSeconds / 60
+//            val seconds = usageTimeSeconds % 60
+//            stringBuilder.append("$appName | $category | $usageTimeMinutes minutes $seconds seconds\n")
+//        }
+
+        return stringBuilder.toString()
+    }
+
+    fun sortAppUsageByTime(appUsageMap: Map<String, AppUsageInfo>): List<Map.Entry<String, AppUsageInfo>> {
+        // 맵의 엔트리를 리스트로 변환하고 totalTimeInForeground에 따라 내림차순 정렬
+        return appUsageMap.entries.sortedByDescending { it.value.totalTimeInForeground }
+    }
+
+
+    class AppUsageInfo(val packageName: String) {
+        var totalTimeInForeground: Long = 0
+        var lastTimeUsed: Long = 0
+
+        fun addUsage(startTime: Long, endTime: Long){
+            if(lastTimeUsed != 0L && startTime < lastTimeUsed) {
+                if(endTime > lastTimeUsed){
+                    totalTimeInForeground += endTime - lastTimeUsed
+                }
+            } else{
+                totalTimeInForeground += endTime - startTime
+            }
+            lastTimeUsed = endTime
+        }
+    }
+
+//    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+//    private fun fetchAppUsageStats(context: Context, result: MethodChannel.Result){
+//        CoroutineScope(Dispatchers.IO).launch {
+//            try {
+//                var fetchData = ""
+//                val usageStatsManager =
+//                    context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+//
+//
+//                val calendar = Calendar.getInstance()
+//
+//                val endTime = calendar.timeInMillis
+//
+//                calendar.add(Calendar.DATE, 1)
+//                calendar.set(Calendar.HOUR_OF_DAY, 0)
+//                calendar.set(Calendar.MINUTE, 0)
+//                calendar.set(Calendar.SECOND, 0)
+//                calendar.set(Calendar.MILLISECOND, 0)
+//                calendar.add(Calendar.DATE, -1)
+//
+//                val startTime = calendar.timeInMillis
+//
+//                val queryUsageStats = usageStatsManager.queryUsageStats(
+//                    UsageStatsManager.INTERVAL_DAILY, startTime, endTime
+//                )
+//
+//                val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
+//
+//                for (us in queryUsageStats) {
+//                    if (us.firstTimeStamp > startTime) { // 10분 이상 사용한 것으로 기준
+//                        val category = getCategory(us.packageName, context)
+//                        fetchData += getAppNameJsoup(
+//                            us.packageName,
+//                            context
+//                        ) + "|" + category + "|" + ((us.totalTimeInForeground / (1000)).toInt()) + " | " + dateFormat.format(startTime)  + " | " + dateFormat.format(endTime) + "\n"
+//                    }
+//                }
+//
+//                withContext(Dispatchers.Main) {
+//                    result.success(
+//                        fetchData
+//                    )
+//                }
+//            } catch (e: Exception){
+//                withContext(Dispatchers.Main){
+//                    result.error("ERROR_FETCHING_DATA", e.message, null)
+//                }
+//            }
+//        }
+//    }
 
     private fun isAccessGranted(context: Context): Boolean{
         val appOpManager = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
