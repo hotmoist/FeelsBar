@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
 import '../models/diary_content_model.dart';
@@ -27,14 +28,15 @@ class _DiaryWidgetState extends State<DiaryWidget> {
   @override
   void initState() {
     super.initState();
-    String refDir = 'users/test/${widget.diaryContent.id}';
     isCommented = widget.diaryContent.showComment == 1 ? true : false;
 
     if (!isCommented) {
       // 코멘트가 표시되지 않은 경우
       DateTime wroteTime = DateTime.parse(
           widget.diaryContent.id.replaceAll(" ", "T")); // 일기 작성 시간
-      DateTime commentShowTime = wroteTime.add(Duration(seconds: 30));
+      // DateTime commentShowTime =
+      // wroteTime.add(Duration(seconds: 30)); // test!!!
+      DateTime commentShowTime = wroteTime.add(const Duration(minutes: 30));
       final now = DateTime.now();
 
       if (!isCommented) {
@@ -44,8 +46,12 @@ class _DiaryWidgetState extends State<DiaryWidget> {
               isCommented = true;
             });
 
+            String userName =
+                (await SharedPreferences.getInstance()).getString('name') ??
+                    "tester";
             await dbHelper.updateShowCommentById(widget.diaryContent.id, 1);
-            DatabaseReference ref = FirebaseDatabase.instance.ref(refDir);
+            DatabaseReference ref = FirebaseDatabase.instance
+                .ref('pilot_test/$userName/${widget.diaryContent.id}');
             await ref.update({
               'isCommented': true,
             });
@@ -56,7 +62,9 @@ class _DiaryWidgetState extends State<DiaryWidget> {
   }
 
   void _deleteDiary(DiaryContent diaryContent) async {
-    String refDir = 'users/test/${widget.diaryContent.id}';
+    String userName =
+        (await SharedPreferences.getInstance()).getString('name') ?? "tester";
+    String refDir = 'pilot_test/$userName/${widget.diaryContent.id}';
     DatabaseReference ref = FirebaseDatabase.instance.ref(refDir);
     await dbHelper.delete(diaryContent.id);
     await ref.update({'status': 'deleted'});

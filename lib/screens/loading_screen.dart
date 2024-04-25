@@ -24,13 +24,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
   late String journalingPrompt = "no prompt";
 
   Future<void> _loadData() async {
-    await _firebaseInit();
     appUsage = await _getAppData();
-    stepcount = await _getStepData();
-    sleep = await _getSleepData();
+    stepcount = (await _getStepData());
+    sleep = (await _getSleepData());
     profileData = await _getProfileData();
+    await _firebaseInit();
 
-    // print(await FirebaseMessaging.instance.getToken());
+    print('---- app 사용 log 기록 ---');
     print(appUsage);
     print("step count: $stepcount");
     print("sleep data: $sleep");
@@ -38,9 +38,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
     print("steps: ${profileData['steps']}");
     print("sleepTime: ${profileData['sleepTime']}");
     print("wakeTime: ${profileData['wakeTime']}");
+    print("screenTime: ${profileData['screenTime']}");
+    print("---------------------------");
 
-    journalingPrompt = await GPTResponse()
-        .fetchGPTPromptResponse(profileData, stepcount, appUsage, sleep);
+    // journalingPrompt = await GPTResponse()
+    //     .fetchGPTPromptResponse(profileData, stepcount, appUsage, sleep);
   }
 
   Future<void> _firebaseInit() async {
@@ -87,6 +89,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     data['steps'] = prefs.get('steps');
     data['sleepTime'] = prefs.get('sleepTime');
     data['wakeTime'] = prefs.get('wakeTime');
+    data['screenTime'] = prefs.get('screenTime');
     return data;
   }
 
@@ -97,7 +100,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return MainPage(
-              journalingPrompt: journalingPrompt,
+              appUsage: appUsage,
+              stepCount: stepcount,
+              sleep: sleep,
+              profileData: profileData,
             );
           } else {
             return const Center(

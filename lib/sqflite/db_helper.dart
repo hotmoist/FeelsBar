@@ -37,7 +37,8 @@ class DBHelper {
       prompt TEXT,
       content TEXT,
       show_comment INTEGER,
-      comment TEXT
+      comment TEXT,
+      is_retrospected INTEGER
     )''');
   }
 
@@ -62,9 +63,21 @@ class DBHelper {
   //           .toList();
   // }
 
+  Future<int> updateRetrospectById(String id, int isRetrospect) async {
+    final db = await database;
+    return await db.update(tableName, {'is_retrospected': isRetrospect},
+        where: 'id = ?', whereArgs: [id]);
+  }
+
   Future<List<Map<String, dynamic>>> queryAll() async {
     final db = await database;
     return await db.query(tableName);
+  }
+
+  Future<List<Map<String, dynamic>>> queryRetrospect() async {
+    final db = await database;
+    return await db
+        .query(tableName, where: 'is_retrospected = ?', whereArgs: [0]);
   }
 
   // Update when received comment

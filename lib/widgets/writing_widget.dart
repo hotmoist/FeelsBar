@@ -15,6 +15,13 @@ class WritingSectionWidget extends StatefulWidget {
 
 class _WritingSectionWidgetState extends State<WritingSectionWidget> {
   final contentEditController = TextEditingController();
+  bool _isButtonEnabled = false;
+
+  void _updateButtonState() {
+    setState(() {
+      _isButtonEnabled = contentEditController.text.isNotEmpty;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +76,7 @@ class _WritingSectionWidgetState extends State<WritingSectionWidget> {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     controller: contentEditController,
+                    onChanged: (value) => _updateButtonState(),
                     maxLines: null,
                     expands: true,
                     textAlignVertical: TextAlignVertical.top,
@@ -85,21 +93,25 @@ class _WritingSectionWidgetState extends State<WritingSectionWidget> {
               child: Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(12, 12, 0, 18),
                 child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (context) {
-                            return FractionallySizedBox(
-                                heightFactor: 0.95,
-                                child: SurveySectionWidget(
-                                  diaryContent: contentEditController.text,
-                                  diaryPrompt: widget.question,
-                                  onRefreshRequested: widget.onRefreshRequested,
-                                ));
-                          });
-                    },
+                    onPressed: _isButtonEnabled
+                        ? () {
+                            Navigator.pop(context);
+                            showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (context) {
+                                  return FractionallySizedBox(
+                                      heightFactor: 0.95,
+                                      child: SurveySectionWidget(
+                                        diaryContent:
+                                            contentEditController.text,
+                                        diaryPrompt: widget.question,
+                                        onRefreshRequested:
+                                            widget.onRefreshRequested,
+                                      ));
+                                });
+                          }
+                        : null,
                     child: const Text("다음")),
               ),
             )

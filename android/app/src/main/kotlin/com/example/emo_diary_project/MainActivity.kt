@@ -152,15 +152,29 @@ class MainActivity: FlutterFragmentActivity() {
     fun formatAppUsageStats(appUsageMap: Map<String, AppUsageInfo>, context: Context): String {
         val stringBuilder = StringBuilder()
         val sortedUsageStats = sortAppUsageByTime(appUsageMap)
-
-        for (entry in sortedUsageStats){
+        var totalUsageTime = 0
+        for ((idx, entry) in sortedUsageStats.withIndex()){
             val packageName = entry.key
-            val appName = getAppNameJsoup(packageName, context)
-            val category = getCategory(packageName, context)
             val usageTimeSeconds = entry.value.totalTimeInForeground / 1000
-            val usageTimeMinutes = usageTimeSeconds / 60
-            val seconds = usageTimeSeconds % 60
-            stringBuilder.append("$appName | $category | $usageTimeMinutes minutes $seconds seconds\n")
+            if(idx < 3){
+                val appName = getAppNameJsoup(packageName, context)
+                val category = getCategory(packageName, context)
+                val usageTimeMinutes = (usageTimeSeconds / 60) % 60
+                val usageTimeHours = usageTimeSeconds / (60 * 60)
+                val seconds = usageTimeSeconds % 60
+                if (usageTimeHours > 0){
+                    stringBuilder.append("어플 이름: $appName | 카테고리: $category | 사용 시간: $usageTimeHours 시간 $usageTimeMinutes 분 $seconds 초\n")
+                } else {
+                    stringBuilder.append("어플 이름: $appName | 카테고리: $category | 사용 시간: $usageTimeMinutes 분 $seconds 초\n")
+                }
+            }
+            totalUsageTime += usageTimeSeconds.toInt()
+        }
+
+        if(totalUsageTime / (60*60) > 0){
+            stringBuilder.append("${totalUsageTime / (60*60)} 시간 ${(totalUsageTime / 60)%60} 분 ${totalUsageTime % 60} 초")
+        } else {
+            stringBuilder.append("${totalUsageTime / 60} 분 ${totalUsageTime % 60} 초")
         }
 
 //        for ((packageName, usageInfo) in appUsageMap) {
@@ -359,16 +373,18 @@ class MainActivity: FlutterFragmentActivity() {
                             timeRangeFilter = TimeRangeFilter.Companion.between(Instant.now().minus(Duration.ofDays(1)), Instant.now())
                         )
                     )
-//                    val sleepStages = sleepData.records.filterIsInstance<androidx.health.connect.client.records.SleepSessionRecord>()
-//                    val sleepStageStrings = sleepStages.map { "${it.startTime} to ${it.endTime}" }
                     val sleepStages = sleepData.records.filterIsInstance<androidx.health.connect.client.records.SleepSessionRecord>()
                     val sleepStageStrings = sleepStages.map {
                         val localStart = it.startTime.atZone(timeZone).toString().substringBefore('+')
                         val localEnd = it.endTime.atZone(timeZone).toString().substringBefore("+")
                         "$localStart to $localEnd"
-                    }.lastOrNull()
+                    }
 
-                    result.success(sleepStageStrings.toString())
+                    if (sleepStageStrings.isEmpty()){
+                        result.success("none");
+                    }else {
+                        result.success(sleepStageStrings.joinToString("\n"));
+                    }
             } catch (e :Exception){
                 withContext(Dispatchers.Main){
                     result.error("ERROR_FETCHING_DATA", e.message, null)
@@ -408,10 +424,13 @@ class MainActivity: FlutterFragmentActivity() {
                         )
                     )
 
-                    val stepCount = response[androidx.health.connect.client.records.StepsRecord.COUNT_TOTAL]
-
+                    var stepCount = response[androidx.health.connect.client.records.StepsRecord.COUNT_TOTAL]
                     withContext(Dispatchers.Main){
-                        result.success(stepCount.toString()) // 데이터 전달에 대해 수정 필요
+                        if (stepCount == null){
+                            result.success("none");
+                        }else{
+                            result.success(stepCount.toString()) // 데이터 전달에 대해 수정 필요
+                        }
                     }
 //                }else{
 //                    requestPermissions.launch(PERMISSIONS)

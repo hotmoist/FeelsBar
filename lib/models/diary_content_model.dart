@@ -5,6 +5,7 @@ class DiaryContent {
   final String content;
   late final int showComment;
   final String comment;
+  final int isRetrospected;
 
   DiaryContent(
       {required this.id,
@@ -12,7 +13,8 @@ class DiaryContent {
       required this.prompt,
       required this.content,
       required this.showComment,
-      required this.comment});
+      required this.comment,
+      required this.isRetrospected});
 
   factory DiaryContent.fromMap(Map<String, dynamic> map) {
     return DiaryContent(
@@ -21,7 +23,8 @@ class DiaryContent {
         prompt: map['prompt'],
         content: map['content'],
         showComment: map['show_comment'],
-        comment: map['comment']);
+        comment: map['comment'],
+        isRetrospected: map['is_retrospected']);
   }
 
   Map<String, dynamic> toMap() {
@@ -32,6 +35,7 @@ class DiaryContent {
       'content': content,
       'show_comment': showComment,
       'comment': comment,
+      'is_retrospected': isRetrospected
     };
   }
 }

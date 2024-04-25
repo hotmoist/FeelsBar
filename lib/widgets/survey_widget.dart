@@ -1,9 +1,11 @@
 import 'package:emo_diary_project/models/diary_content_model.dart';
 import 'package:emo_diary_project/models/gpt_response_model.dart';
+import 'package:emo_diary_project/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:group_radio_button/group_radio_button.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../sqflite/db_helper.dart';
 
@@ -27,6 +29,13 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
   var surveyTwoValue = "-1";
   final dbHelper = DBHelper();
   bool isSending = false;
+  bool _isButtonEnabled = false;
+
+  void _updateButtonState() {
+    setState(() {
+      _isButtonEnabled = (surveyOneValue != "-1") && (surveyTwoValue != "-1");
+    });
+  }
 
   Future<void> fetchData() async {
     setState(() {
@@ -34,10 +43,15 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
     });
 
     DateTime date = DateTime.now();
+    String? userName =
+        (await SharedPreferences.getInstance()).getString('name') ?? "tester";
     String diaryId = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-    String refDir = 'users/test/$diaryId';
+    String refDir = 'pilot_test/$userName/$diaryId';
+    final prefs = await SharedPreferences.getInstance();
     String comment =
         await GPTResponse().fetchGPTCommentResponse(widget.diaryContent);
+    String? userPrompt = prefs.getString("userPrompt");
+    String? systemPrompt = prefs.getString("systemPrompt");
     // DB에 저장
     await dbHelper.insert(DiaryContent(
         id: diaryId,
@@ -45,16 +59,26 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
         prompt: widget.diaryPrompt,
         showComment: 0,
         content: widget.diaryContent,
-        comment: comment));
+        comment: comment,
+        isRetrospected: 0));
 
     // print(await GPTResponse()
     //     .fetchGPTCommentResponse(widget.diaryContent));
     widget.onRefreshRequested();
 
+    if (isRetroMode) {
+      await dbHelper.updateRetrospectById(target.id, 1);
+      setState(() {
+        isRetroMode = false;
+      });
+    }
+
     DatabaseReference ref = FirebaseDatabase.instance.ref(refDir);
     await ref.set({
       'date': diaryId,
-      'prompt': widget.diaryPrompt,
+      'system_prompt': systemPrompt,
+      'user_prompt': userPrompt,
+      'diary_prompt': widget.diaryPrompt,
       'content': widget.diaryContent,
       'survey1': surveyOneValue,
       'survey2': surveyTwoValue,
@@ -71,10 +95,8 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
   }
 
   Widget _sendingScreen() {
-    return Container(
-      child: Center(
-        child: CircularProgressIndicator(),
-      ),
+    return const Center(
+      child: CircularProgressIndicator(),
     );
   }
 
@@ -145,6 +167,7 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
                                   direction: Axis.horizontal,
                                   onChanged: (value) => setState(() {
                                         surveyOneValue = value.toString();
+                                        _updateButtonState();
                                       }),
                                   items: const ['1', '2', '3', '4', '5'],
                                   itemBuilder: (item) => RadioButtonBuilder(
@@ -185,6 +208,7 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
                                   direction: Axis.horizontal,
                                   onChanged: (value) => setState(() {
                                         surveyTwoValue = value.toString();
+                                        _updateButtonState();
                                       }),
                                   items: const ['1', '2', '3', '4', '5'],
                                   itemBuilder: (item) => RadioButtonBuilder(
@@ -205,10 +229,12 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
                             const EdgeInsetsDirectional.fromSTEB(12, 12, 0, 18),
                         child: ElevatedButton(
                             // 작성 완료시 작동하는 버튼
-                            onPressed: () async {
-                              fetchData();
-                              // Navigator.pop(context);
-                            },
+                            onPressed: _isButtonEnabled
+                                ? () async {
+                                    fetchData();
+                                    // Navigator.pop(context);
+                                  }
+                                : null,
                             child: const Text("작성 완료")),
                       ),
                     )
