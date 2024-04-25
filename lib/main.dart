@@ -26,7 +26,7 @@ Future<void> _initFirebaseMessaging() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
       options: const FirebaseOptions(
-          apiKey: 'k', appId: 'k', messagingSenderId: 'k', projectId: 'k'));
+          apiKey: '', appId: '', messagingSenderId: '', projectId: ''));
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHanlder);
   channel = const AndroidNotificationChannel(
