@@ -37,6 +37,7 @@ class DBHelper {
       prompt TEXT,
       content TEXT,
       show_comment INTEGER,
+      show_survey INTEGER,
       comment TEXT,
       is_retrospected INTEGER
     )''');
@@ -84,6 +85,12 @@ class DBHelper {
   Future<int> updateShowCommentById(String id, int showComment) async {
     final db = await database;
     return await db.update(tableName, {'show_comment': showComment},
+        where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateShowSurveyById(String id, int showSurvey) async {
+    final db = await database;
+    return await db.update(tableName, {'show_survey': showSurvey},
         where: 'id = ?', whereArgs: [id]);
   }
 

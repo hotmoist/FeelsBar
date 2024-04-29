@@ -1,13 +1,17 @@
-import 'package:emo_diary_project/widgets/survey_widget.dart';
+import 'package:emo_diary_project/widgets/second_survey_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class WritingSectionWidget extends StatefulWidget {
   final VoidCallback onRefreshRequested;
   final String question;
+  final String surveyOne;
 
   const WritingSectionWidget(
-      {super.key, required this.question, required this.onRefreshRequested});
+      {super.key,
+      required this.question,
+      required this.onRefreshRequested,
+      required this.surveyOne});
 
   @override
   State<WritingSectionWidget> createState() => _WritingSectionWidgetState();
@@ -102,12 +106,13 @@ class _WritingSectionWidgetState extends State<WritingSectionWidget> {
                                 builder: (context) {
                                   return FractionallySizedBox(
                                       heightFactor: 0.95,
-                                      child: SurveySectionWidget(
+                                      child: SecondSurveySectionWidget(
                                         diaryContent:
                                             contentEditController.text,
                                         diaryPrompt: widget.question,
                                         onRefreshRequested:
                                             widget.onRefreshRequested,
+                                        surveyOne: widget.surveyOne,
                                       ));
                                 });
                           }
