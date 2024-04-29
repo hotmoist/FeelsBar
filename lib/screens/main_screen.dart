@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:emo_diary_project/models/diary_content_model.dart';
 import 'package:emo_diary_project/models/gpt_response_model.dart';
 import 'package:emo_diary_project/sqflite/db_helper.dart';
+import 'package:emo_diary_project/widgets/first_survey_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/diary_list_widget.dart';
@@ -75,13 +76,13 @@ class _MainPageState extends State<MainPage> {
 
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
-        // bottom sheet ����
+        // bottom sheet
         context: context,
         isScrollControlled: true,
         builder: (context) {
           return FractionallySizedBox(
               heightFactor: 0.95,
-              child: WritingSectionWidget(
+              child: FirstSurveySectionWidget(
                 question: journalingPrompt,
                 onRefreshRequested: () =>
                     _listKey.currentState?.refreshItemList(),

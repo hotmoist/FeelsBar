@@ -1,3 +1,4 @@
+import 'package:emo_diary_project/widgets/writing_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../models/diary_content_model.dart';

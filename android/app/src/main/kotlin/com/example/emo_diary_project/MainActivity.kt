@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
@@ -63,6 +64,7 @@ class MainActivity: FlutterFragmentActivity() {
             HealthPermission.getReadPermission(androidx.health.connect.client.records.SleepSessionRecord::class),
         )
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 //        myFlutterEngine = DFlutterEngine(this, flutterEngine);
@@ -71,6 +73,7 @@ class MainActivity: FlutterFragmentActivity() {
             when (call.method) {
                 "checkPermission" -> {
                     requestUsageStatePermission(this)
+                    requestNotificationPermission(this)
                     checkPermissions()
                 }
                 "getSleepData" -> {
@@ -280,6 +283,20 @@ class MainActivity: FlutterFragmentActivity() {
                 if(!isAccessGranted(context)){
                     val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
                     ContextCompat.startActivity(context, intent, null)
+                }
+            }.await()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun requestNotificationPermission(context: Context){
+        val REQUEST_CODE = 1
+        CoroutineScope(Dispatchers.IO).launch {
+            async {
+                if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED){
+//                    val intent = Intent(Settings.ACTION_ALL_APPS_NOTIFICATION_SETTINGS)
+//                    ContextCompat.startActivity(context, intent, null)
+                    requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), REQUEST_CODE);
                 }
             }.await()
         }

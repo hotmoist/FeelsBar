@@ -31,7 +31,7 @@ Future<void> _initFirebaseMessaging() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHanlder);
   channel = const AndroidNotificationChannel(
       'diary_channel', 'Test Notification',
-      description: 'test', importance: Importance.high);
+      description: 'test', importance: Importance.max);
 
   var initSettingsAndorid =
       const AndroidInitializationSettings('@mipmap/ic_launcher');

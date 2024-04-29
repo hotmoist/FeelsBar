@@ -9,31 +9,37 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../sqflite/db_helper.dart';
 
-class SurveySectionWidget extends StatefulWidget {
+class SecondSurveySectionWidget extends StatefulWidget {
   final String diaryContent;
   final String diaryPrompt;
+  final String surveyOne;
   final VoidCallback onRefreshRequested;
 
-  const SurveySectionWidget(
+  const SecondSurveySectionWidget(
       {super.key,
       required this.diaryContent,
       required this.diaryPrompt,
-      required this.onRefreshRequested});
+      required this.onRefreshRequested,
+      required this.surveyOne});
 
   @override
-  State<SurveySectionWidget> createState() => _SurveySectionWidgetState();
+  State<SecondSurveySectionWidget> createState() =>
+      _SecondSurveySectionWidgetState();
 }
 
-class _SurveySectionWidgetState extends State<SurveySectionWidget> {
-  var surveyOneValue = "-1";
+class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
   var surveyTwoValue = "-1";
+  var surveyThreeValue = "-1";
+  var surveyFourValue = "-1";
   final dbHelper = DBHelper();
   bool isSending = false;
   bool _isButtonEnabled = false;
 
   void _updateButtonState() {
     setState(() {
-      _isButtonEnabled = (surveyOneValue != "-1") && (surveyTwoValue != "-1");
+      _isButtonEnabled = (surveyTwoValue != "-1") &&
+          (surveyThreeValue != "-1") &&
+          (surveyFourValue != '-1');
     });
   }
 
@@ -58,6 +64,7 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
         date: date.toString(),
         prompt: widget.diaryPrompt,
         showComment: 0,
+        showSurvey: 0,
         content: widget.diaryContent,
         comment: comment,
         isRetrospected: 0));
@@ -80,8 +87,11 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
       'user_prompt': userPrompt,
       'diary_prompt': widget.diaryPrompt,
       'content': widget.diaryContent,
-      'survey1': surveyOneValue,
-      'survey2': surveyTwoValue,
+      'survey_1': widget.surveyOne,
+      'survey_2': surveyTwoValue,
+      'survey_3': surveyThreeValue,
+      'survey_4': surveyFourValue,
+      'survey_5': "-1",
       'isCommented': false,
       'status': 'onView',
       'comment': comment,
@@ -136,7 +146,7 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
                       ],
                     ),
                     Container(
-                      // 설문 1번: 오늘의 감정이 긍정적이었나요
+                      // 설문 2: 일기 작성 후 감정 평가
                       width: double.infinity,
                       decoration: BoxDecoration(
                           color: const Color(0xFFFEF7FF), border: Border.all()),
@@ -148,7 +158,7 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
                             child: Padding(
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
-                              child: Text("오늘의 감정은 긍정적인가요?"),
+                              child: Text("일기 작성 후 감정은 긍정적인가요?"),
                             ),
                           ),
                           const Align(
@@ -163,10 +173,10 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
                               padding: const EdgeInsetsDirectional.fromSTEB(
                                   0, 4, 0, 4),
                               child: RadioGroup<String>.builder(
-                                  groupValue: surveyOneValue,
+                                  groupValue: surveyTwoValue,
                                   direction: Axis.horizontal,
                                   onChanged: (value) => setState(() {
-                                        surveyOneValue = value.toString();
+                                        surveyTwoValue = value.toString();
                                         _updateButtonState();
                                       }),
                                   items: const ['1', '2', '3', '4', '5'],
@@ -177,7 +187,7 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
                       ),
                     ),
                     Container(
-                      // 설문 2번: 오늘의 질문이 사용자를 잘 이해...
+                      // 설문 3: AI의 사용자 이해도 평가 (일기 prompt 기반)
                       width: double.infinity,
                       decoration: BoxDecoration(
                           color: const Color(0xFFFEF7FF), border: Border.all()),
@@ -204,10 +214,52 @@ class _SurveySectionWidgetState extends State<SurveySectionWidget> {
                               padding: const EdgeInsetsDirectional.fromSTEB(
                                   0, 4, 0, 4),
                               child: RadioGroup<String>.builder(
-                                  groupValue: surveyTwoValue,
+                                  groupValue: surveyThreeValue,
                                   direction: Axis.horizontal,
                                   onChanged: (value) => setState(() {
-                                        surveyTwoValue = value.toString();
+                                        surveyThreeValue = value.toString();
+                                        _updateButtonState();
+                                      }),
+                                  items: const ['1', '2', '3', '4', '5'],
+                                  itemBuilder: (item) => RadioButtonBuilder(
+                                        item,
+                                      )))
+                        ],
+                      ),
+                    ),
+                    Container(
+                      // 설문 4: 사용자의 일기 작성 시 self-disclosure 평가
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                          color: const Color(0xFFFEF7FF), border: Border.all()),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          const Align(
+                            alignment: AlignmentDirectional(-1, 0),
+                            child: Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
+                              child: Text(
+                                  "오늘 일기에 자신의 이야기를 모두 다 나타내었나요? (self-disclosure)"),
+                            ),
+                          ),
+                          const Align(
+                            alignment: AlignmentDirectional(-1, 0),
+                            child: Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
+                              child: Text('(1: 전혀 아니다, 5: 매우 그렇다)'),
+                            ),
+                          ),
+                          Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  0, 4, 0, 4),
+                              child: RadioGroup<String>.builder(
+                                  groupValue: surveyFourValue,
+                                  direction: Axis.horizontal,
+                                  onChanged: (value) => setState(() {
+                                        surveyFourValue = value.toString();
                                         _updateButtonState();
                                       }),
                                   items: const ['1', '2', '3', '4', '5'],

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GPTResponse {
-  final apiKey = 'API key HERE';
+  final apiKey = '';
   final url = Uri.parse("https://api.openai.com/v1/chat/completions");
 
   Future<String> fetchRetrospectPromptResponse(

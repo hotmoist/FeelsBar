@@ -4,6 +4,7 @@ class DiaryContent {
   final String prompt;
   final String content;
   late final int showComment;
+  late final int showSurvey;
   final String comment;
   final int isRetrospected;
 
@@ -13,6 +14,7 @@ class DiaryContent {
       required this.prompt,
       required this.content,
       required this.showComment,
+      required this.showSurvey,
       required this.comment,
       required this.isRetrospected});
 
@@ -23,6 +25,7 @@ class DiaryContent {
         prompt: map['prompt'],
         content: map['content'],
         showComment: map['show_comment'],
+        showSurvey: map['show_survey'],
         comment: map['comment'],
         isRetrospected: map['is_retrospected']);
   }
@@ -34,6 +37,7 @@ class DiaryContent {
       'prompt': prompt,
       'content': content,
       'show_comment': showComment,
+      'show_survey': showSurvey,
       'comment': comment,
       'is_retrospected': isRetrospected
     };
