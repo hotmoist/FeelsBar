@@ -43,6 +43,11 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
     });
   }
 
+  int _countWords(String content) {
+    List<String> list = content.split(" ");
+    return list.length;
+  }
+
   Future<void> fetchData() async {
     setState(() {
       isSending = true;
@@ -86,7 +91,7 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
       'system_prompt': systemPrompt,
       'user_prompt': userPrompt,
       'diary_prompt': widget.diaryPrompt,
-      'content': widget.diaryContent,
+      'content': _countWords(widget.diaryContent),
       'survey_1': widget.surveyOne,
       'survey_2': surveyTwoValue,
       'survey_3': surveyThreeValue,
@@ -158,7 +163,7 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
                             child: Padding(
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
-                              child: Text("일기 작성 후 감정은 긍정적인가요?"),
+                              child: Text("현재 ('일기 작성 후') 감정이 쓸쓸한가요?"),
                             ),
                           ),
                           const Align(
@@ -240,8 +245,8 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
                             child: Padding(
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
-                              child: Text(
-                                  "오늘 일기에 자신의 이야기를 모두 다 나타내었나요? (self-disclosure)"),
+                              child:
+                                  Text("오늘 작성한 일기에서 개인적인 문제나 고민을 자세히 서술하셨나요?"),
                             ),
                           ),
                           const Align(

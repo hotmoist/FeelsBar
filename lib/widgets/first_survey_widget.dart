@@ -83,7 +83,7 @@ class _FirstSurveySectionWidgetState extends State<FirstSurveySectionWidget> {
                       alignment: AlignmentDirectional(-1, 0),
                       child: Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
-                        child: Text("일기 작성 전 감정이 긍정적인가요?"),
+                        child: Text("현재(\'일기 작성 전\') 감정이 쓸쓸한가요?"),
                       ),
                     ),
                     const Align(
