@@ -8,11 +8,15 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.health.connect.datatypes.units.Power
+import android.net.Uri
 import android.os.Build
+import android.os.PowerManager
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -74,6 +78,7 @@ class MainActivity: FlutterFragmentActivity() {
                 "checkPermission" -> {
                     requestUsageStatePermission(this)
                     requestNotificationPermission(this)
+                    requestIgnoreOptimization(this)
                     checkPermissions()
                 }
                 "getSleepData" -> {
@@ -282,6 +287,7 @@ class MainActivity: FlutterFragmentActivity() {
             async{
                 if(!isAccessGranted(context)){
                     val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+                    intent.setData(Uri.parse("package:" + context.packageName))
                     ContextCompat.startActivity(context, intent, null)
                 }
             }.await()
@@ -299,6 +305,22 @@ class MainActivity: FlutterFragmentActivity() {
                     requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), REQUEST_CODE);
                 }
             }.await()
+        }
+    }
+
+    private fun requestIgnoreOptimization(context: Context){
+        val REQUEST_CODE = 1
+        CoroutineScope(Dispatchers.IO).launch{
+            async {
+                val powerManager: PowerManager = getSystemService(POWER_SERVICE) as PowerManager
+                if(!powerManager.isIgnoringBatteryOptimizations(packageName)){
+//                    requestPermissions(
+//                        arrayOf(android.Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS), REQUEST_CODE);
+                    val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                    intent.setData(Uri.parse("package:" +context.packageName))
+                    startActivity(intent)
+                }
+            }
         }
     }
 
