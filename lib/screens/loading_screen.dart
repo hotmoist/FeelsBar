@@ -113,7 +113,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   CircularProgressIndicator(),
                   Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: Text("에이전트가 당신을 스스슥슈슉..."))
+                      child: Text("AI 에이전트가 분주히 움직이는 중입니다..."))
                 ],
               ),
             );
