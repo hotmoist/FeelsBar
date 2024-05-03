@@ -163,7 +163,7 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
                             child: Padding(
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
-                              child: Text("현재 ('일기 작성 후') 감정이 쓸쓸한가요?"),
+                              child: Text("나의 현재('일기 작성 후') 감정은"),
                             ),
                           ),
                           const Align(
@@ -171,7 +171,7 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
                             child: Padding(
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
-                              child: Text('(1: 전혀 아니다, 5: 매우 그렇다)'),
+                              child: Text('(1: 전혀 쓸쓸하지 않다, 4: 매우 쓸쓸하다)'),
                             ),
                           ),
                           Padding(
@@ -184,7 +184,7 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
                                         surveyTwoValue = value.toString();
                                         _updateButtonState();
                                       }),
-                                  items: const ['1', '2', '3', '4', '5'],
+                                  items: const ['1', '2', '3', '4'],
                                   itemBuilder: (item) => RadioButtonBuilder(
                                         item,
                                       )))
@@ -204,7 +204,7 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
                             child: Padding(
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
-                              child: Text("오늘의 질문이 사용자를 잘 이해했다고 생각하시나요?"),
+                              child: Text("오늘의 문구가 나를 잘 헤아린다고 생각하시나요?"),
                             ),
                           ),
                           const Align(
@@ -212,7 +212,7 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
                             child: Padding(
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
-                              child: Text('(1: 전혀 아니다, 5: 매우 그렇다)'),
+                              child: Text('(1: 전혀 아니다, 4: 매우 그렇다)'),
                             ),
                           ),
                           Padding(
@@ -225,7 +225,7 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
                                         surveyThreeValue = value.toString();
                                         _updateButtonState();
                                       }),
-                                  items: const ['1', '2', '3', '4', '5'],
+                                  items: const ['1', '2', '3', '4'],
                                   itemBuilder: (item) => RadioButtonBuilder(
                                         item,
                                       )))
@@ -254,7 +254,7 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
                             child: Padding(
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
-                              child: Text('(1: 전혀 아니다, 5: 매우 그렇다)'),
+                              child: Text('(1: 전혀 아니다, 4: 매우 그렇다)'),
                             ),
                           ),
                           Padding(
@@ -267,7 +267,7 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
                                         surveyFourValue = value.toString();
                                         _updateButtonState();
                                       }),
-                                  items: const ['1', '2', '3', '4', '5'],
+                                  items: const ['1', '2', '3', '4'],
                                   itemBuilder: (item) => RadioButtonBuilder(
                                         item,
                                       )))

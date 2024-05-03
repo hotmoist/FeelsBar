@@ -161,11 +161,17 @@ class MainActivity: FlutterFragmentActivity() {
         val stringBuilder = StringBuilder()
         val sortedUsageStats = sortAppUsageByTime(appUsageMap)
         var totalUsageTime = 0
-        for ((idx, entry) in sortedUsageStats.withIndex()){
+        var idx = 0
+//        for ((idx, entry) in sortedUsageStats.withIndex()){
+        for(entry in sortedUsageStats){
             val packageName = entry.key
             val usageTimeSeconds = entry.value.totalTimeInForeground / 1000
             if(idx < 3){
                 val appName = getAppNameJsoup(packageName, context)
+                if((appName == "권한 관리자") || (appName == "설정")
+                ){
+                    continue
+                }
                 val category = getCategory(packageName, context)
                 val usageTimeMinutes = (usageTimeSeconds / 60) % 60
                 val usageTimeHours = usageTimeSeconds / (60 * 60)
@@ -175,6 +181,7 @@ class MainActivity: FlutterFragmentActivity() {
                 } else {
                     stringBuilder.append("어플 이름: $appName | 카테고리: $category | 사용 시간: $usageTimeMinutes 분 $seconds 초\n")
                 }
+                idx++
             }
             totalUsageTime += usageTimeSeconds.toInt()
         }

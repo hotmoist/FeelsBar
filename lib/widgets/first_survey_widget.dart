@@ -83,14 +83,14 @@ class _FirstSurveySectionWidgetState extends State<FirstSurveySectionWidget> {
                       alignment: AlignmentDirectional(-1, 0),
                       child: Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
-                        child: Text("현재(\'일기 작성 전\') 감정이 쓸쓸한가요?"),
+                        child: Text("나의 현재(\'일기 작성 전\') 감정은"),
                       ),
                     ),
                     const Align(
                       alignment: AlignmentDirectional(-1, 0),
                       child: Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
-                        child: Text('(1: 전혀 아니다, 5: 매우 그렇다)'),
+                        child: Text('(1: 전혀 쓸쓸하지 않다, 4: 매우 쓸쓸하다)'),
                       ),
                     ),
                     Padding(
@@ -103,7 +103,7 @@ class _FirstSurveySectionWidgetState extends State<FirstSurveySectionWidget> {
                                   surveyOneValue = value.toString();
                                   _updateButtonState();
                                 }),
-                            items: const ['1', '2', '3', '4', '5'],
+                            items: const ['1', '2', '3', '4'],
                             itemBuilder: (item) => RadioButtonBuilder(
                                   item,
                                 )))
