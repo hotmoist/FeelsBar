@@ -86,8 +86,8 @@ class _WritingSectionWidgetState extends State<WritingSectionWidget> {
                     textAlignVertical: TextAlignVertical.top,
                     keyboardType: TextInputType.multiline,
                     decoration: const InputDecoration(
-                      hintText: '당신이 겪은 일 또는 왜 그랬는지 작성 해 보세요',
-                    ),
+                        // hintText: '당신이 겪은 일 또는 왜 그랬는지 작성 해 보세요',
+                        hintText: '당신의 이야기를 들려주세요'),
                   ),
                 ),
               ),
