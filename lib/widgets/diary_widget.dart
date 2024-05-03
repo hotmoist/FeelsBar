@@ -97,14 +97,14 @@ class _DiaryWidgetState extends State<DiaryWidget> {
               alignment: AlignmentDirectional(-1, 0),
               child: Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
-                child: Text('답글을 읽은 직후 감정이 어떠한가요?'),
+                child: Text('나는 현재(답글을 읽은 후) 감정은'),
               ),
             ),
             const Align(
               alignment: AlignmentDirectional(-1, 0),
               child: Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
-                child: Text('(1: 전혀 아니다, 5: 매우 그렇다)'),
+                child: Text('(1: 전혀 쓸쓸하지 않다, 4: 매우 쓸쓸하다)'),
               ),
             ),
             Padding(
@@ -116,7 +116,7 @@ class _DiaryWidgetState extends State<DiaryWidget> {
                           surveyFiveVal = value.toString();
                           _updateButtonState();
                         }),
-                    items: const ['1', '2', '3', '4', '5'],
+                    items: const ['1', '2', '3', '4'],
                     itemBuilder: (item) => RadioButtonBuilder(item))),
             Center(
               child: ElevatedButton(
