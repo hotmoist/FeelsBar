@@ -6,12 +6,16 @@ class WritingSectionWidget extends StatefulWidget {
   final VoidCallback onRefreshRequested;
   final String question;
   final String surveyOne;
+  final String beforePHQ_1;
+  final String beforePHQ_2;
 
   const WritingSectionWidget(
       {super.key,
       required this.question,
       required this.onRefreshRequested,
-      required this.surveyOne});
+      required this.surveyOne,
+      required this.beforePHQ_1,
+      required this.beforePHQ_2});
 
   @override
   State<WritingSectionWidget> createState() => _WritingSectionWidgetState();
@@ -113,6 +117,8 @@ class _WritingSectionWidgetState extends State<WritingSectionWidget> {
                                         onRefreshRequested:
                                             widget.onRefreshRequested,
                                         surveyOne: widget.surveyOne,
+                                        beforePHQ_1: widget.beforePHQ_1,
+                                        beforePHQ_2: widget.beforePHQ_2,
                                       ));
                                 });
                           }

@@ -13,6 +13,8 @@ class SecondSurveySectionWidget extends StatefulWidget {
   final String diaryContent;
   final String diaryPrompt;
   final String surveyOne;
+  final String beforePHQ_1;
+  final String beforePHQ_2;
   final VoidCallback onRefreshRequested;
 
   const SecondSurveySectionWidget(
@@ -20,7 +22,9 @@ class SecondSurveySectionWidget extends StatefulWidget {
       required this.diaryContent,
       required this.diaryPrompt,
       required this.onRefreshRequested,
-      required this.surveyOne});
+      required this.surveyOne,
+      required this.beforePHQ_1,
+      required this.beforePHQ_2});
 
   @override
   State<SecondSurveySectionWidget> createState() =>
@@ -93,10 +97,14 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
       'diary_prompt': widget.diaryPrompt,
       'content': _countWords(widget.diaryContent),
       'survey_1': widget.surveyOne,
+      'beforePHQ_1': widget.beforePHQ_1,
+      'beforePHQ_2': widget.beforePHQ_2,
       'survey_2': surveyTwoValue,
       'survey_3': surveyThreeValue,
       'survey_4': surveyFourValue,
       'survey_5': "-1",
+      'afterPHQ_1': "-1",
+      'afterPHQ_2': "-1",
       'isCommented': false,
       'status': 'onView',
       'comment': comment,
@@ -163,7 +171,7 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
                             child: Padding(
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
-                              child: Text("나의 현재('일기 작성 후') 감정은"),
+                              child: Text("나의 현재(일기 작성 후) 감정은"),
                             ),
                           ),
                           const Align(
@@ -171,7 +179,7 @@ class _SecondSurveySectionWidgetState extends State<SecondSurveySectionWidget> {
                             child: Padding(
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
-                              child: Text('(1: 전혀 쓸쓸하지 않다, 4: 매우 쓸쓸하다)'),
+                              child: Text('(1: 전혀 외롭지 않다, 4: 매우 외롭다)'),
                             ),
                           ),
                           Padding(

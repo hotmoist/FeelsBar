@@ -16,6 +16,8 @@ class FirstSurveySectionWidget extends StatefulWidget {
 
 class _FirstSurveySectionWidgetState extends State<FirstSurveySectionWidget> {
   var surveyOneValue = "-1";
+  var beforePHQ_1 = "-1";
+  var beforePHQ_2 = "-1";
   bool _isButtonEnabled = false;
 
   void _updateButtonState() {
@@ -35,6 +37,8 @@ class _FirstSurveySectionWidgetState extends State<FirstSurveySectionWidget> {
                 question: widget.question,
                 onRefreshRequested: widget.onRefreshRequested,
                 surveyOne: surveyOneValue,
+                beforePHQ_1: beforePHQ_1,
+                beforePHQ_2: beforePHQ_2,
               ));
         });
   }
@@ -72,7 +76,7 @@ class _FirstSurveySectionWidgetState extends State<FirstSurveySectionWidget> {
                 ],
               ),
               Container(
-                // 설문 1번: 감정 평가
+                // 설문 1번: 외로움 평가
                 width: double.infinity,
                 decoration: BoxDecoration(
                     color: const Color(0xFFFEF7FF), border: Border.all()),
@@ -83,14 +87,14 @@ class _FirstSurveySectionWidgetState extends State<FirstSurveySectionWidget> {
                       alignment: AlignmentDirectional(-1, 0),
                       child: Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
-                        child: Text("나의 현재(\'일기 작성 전\') 감정은"),
+                        child: Text("나의 현재(일기 작성 전) 감정은"),
                       ),
                     ),
                     const Align(
                       alignment: AlignmentDirectional(-1, 0),
                       child: Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
-                        child: Text('(1: 전혀 쓸쓸하지 않다, 4: 매우 쓸쓸하다)'),
+                        child: Text('(1: 전혀 외롭지 않다, 4: 매우 외롭다)'),
                       ),
                     ),
                     Padding(
@@ -101,6 +105,86 @@ class _FirstSurveySectionWidgetState extends State<FirstSurveySectionWidget> {
                             direction: Axis.horizontal,
                             onChanged: (value) => setState(() {
                                   surveyOneValue = value.toString();
+                                  _updateButtonState();
+                                }),
+                            items: const ['1', '2', '3', '4'],
+                            itemBuilder: (item) => RadioButtonBuilder(
+                                  item,
+                                )))
+                  ],
+                ),
+              ),
+              Container(
+                // 설문 2번: PHQ-2 중 1번 문항
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: const Color(0xFFFEF7FF), border: Border.all()),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    const Align(
+                      alignment: AlignmentDirectional(-1, 0),
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
+                        child: Text(
+                            "나의 현재(\'일기 작성 전\') 일을 함에 있어 거의 흥미가 없거나 즐거움이 없다"),
+                      ),
+                    ),
+                    const Align(
+                      alignment: AlignmentDirectional(-1, 0),
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
+                        child: Text('(1: 전혀 아니다, 4: 매우 그렇다)'),
+                      ),
+                    ),
+                    Padding(
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 4),
+                        child: RadioGroup<String>.builder(
+                            groupValue: beforePHQ_1,
+                            direction: Axis.horizontal,
+                            onChanged: (value) => setState(() {
+                                  beforePHQ_1 = value.toString();
+                                  _updateButtonState();
+                                }),
+                            items: const ['1', '2', '3', '4'],
+                            itemBuilder: (item) => RadioButtonBuilder(
+                                  item,
+                                )))
+                  ],
+                ),
+              ),
+              Container(
+                // 설문 2번: PHQ-2 중 2번 문항
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: const Color(0xFFFEF7FF), border: Border.all()),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    const Align(
+                      alignment: AlignmentDirectional(-1, 0),
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
+                        child:
+                            Text("나의 현재(\'일기 작성 전\') 기분이 가라앉거나 우울하거나 희망이 없다"),
+                      ),
+                    ),
+                    const Align(
+                      alignment: AlignmentDirectional(-1, 0),
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
+                        child: Text('(1: 전혀 아니다, 4: 매우 그렇다)'),
+                      ),
+                    ),
+                    Padding(
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 4),
+                        child: RadioGroup<String>.builder(
+                            groupValue: beforePHQ_2,
+                            direction: Axis.horizontal,
+                            onChanged: (value) => setState(() {
+                                  beforePHQ_2 = value.toString();
                                   _updateButtonState();
                                 }),
                             items: const ['1', '2', '3', '4'],
