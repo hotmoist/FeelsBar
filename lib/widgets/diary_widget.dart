@@ -25,6 +25,8 @@ class _DiaryWidgetState extends State<DiaryWidget> {
   // "Written diary:${widget.diaryContent.content}}\nmax 4 lines\nif over 4 lines\nthan use \'...\' instead\nyeah";
   final dbHelper = DBHelper();
   String surveyFiveVal = "-1";
+  String afterPHQ_1 = "-1";
+  String afterPHQ_2 = "-1";
   bool isCommented = false;
   bool isSurveyed = false;
   bool isButtenEnabled = false;
@@ -82,7 +84,11 @@ class _DiaryWidgetState extends State<DiaryWidget> {
     String refDir = 'pilot_test/$userName/${widget.diaryContent.id}';
     DatabaseReference ref = FirebaseDatabase.instance.ref(refDir);
     await dbHelper.updateShowSurveyById(widget.diaryContent.id, 1);
-    await ref.update({'survey_5': surveyFiveVal});
+    await ref.update({
+      'survey_5': surveyFiveVal,
+      'afterPHQ_1': afterPHQ_1,
+      'afterPHQ_2': afterPHQ_2
+    });
   }
 
   Widget surveyCard() {
@@ -93,31 +99,106 @@ class _DiaryWidgetState extends State<DiaryWidget> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         child: Column(
           children: [
-            const Align(
-              alignment: AlignmentDirectional(-1, 0),
-              child: Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
-                child: Text('나는 현재(답글을 읽은 후) 감정은'),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(border: Border.all()),
+              child: Column(
+                children: [
+                  const Align(
+                    alignment: AlignmentDirectional(-1, 0),
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
+                      child: Text('나는 현재(답글을 읽은 후) 감정은'),
+                    ),
+                  ),
+                  const Align(
+                    alignment: AlignmentDirectional(-1, 0),
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
+                      child: Text('(1: 전혀 외롭지 않다, 4: 매우 외롭다)'),
+                    ),
+                  ),
+                  Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(0, 2, 0, 2),
+                      child: RadioGroup<String>.builder(
+                          groupValue: surveyFiveVal,
+                          direction: Axis.horizontal,
+                          onChanged: (value) => setState(() {
+                                surveyFiveVal = value.toString();
+                                _updateButtonState();
+                              }),
+                          items: const ['1', '2', '3', '4'],
+                          itemBuilder: (item) => RadioButtonBuilder(item))),
+                ],
               ),
             ),
-            const Align(
-              alignment: AlignmentDirectional(-1, 0),
-              child: Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
-                child: Text('(1: 전혀 쓸쓸하지 않다, 4: 매우 쓸쓸하다)'),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(border: Border.all()),
+              child: Column(
+                children: [
+                  const Align(
+                    alignment: AlignmentDirectional(-1, 0),
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
+                      child:
+                          Text('나는 현재(답글을 읽은 후) 일을 함에 있어 거의 흥미가 없거나 즐거움이 없다'),
+                    ),
+                  ),
+                  const Align(
+                    alignment: AlignmentDirectional(-1, 0),
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
+                      child: Text('(1: 전혀 아니다, 4: 매우 그렇다)'),
+                    ),
+                  ),
+                  Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(0, 2, 0, 2),
+                      child: RadioGroup<String>.builder(
+                          groupValue: afterPHQ_1,
+                          direction: Axis.horizontal,
+                          onChanged: (value) => setState(() {
+                                afterPHQ_1 = value.toString();
+                                _updateButtonState();
+                              }),
+                          items: const ['1', '2', '3', '4'],
+                          itemBuilder: (item) => RadioButtonBuilder(item))),
+                ],
               ),
             ),
-            Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0, 2, 0, 2),
-                child: RadioGroup<String>.builder(
-                    groupValue: surveyFiveVal,
-                    direction: Axis.horizontal,
-                    onChanged: (value) => setState(() {
-                          surveyFiveVal = value.toString();
-                          _updateButtonState();
-                        }),
-                    items: const ['1', '2', '3', '4'],
-                    itemBuilder: (item) => RadioButtonBuilder(item))),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(border: Border.all()),
+              child: Column(
+                children: [
+                  const Align(
+                    alignment: AlignmentDirectional(-1, 0),
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(8, 4, 8, 0),
+                      child: Text('나는 현재(답글을 읽은 후) 기분이 가라앉거나 우울하거나 희망이 없다'),
+                    ),
+                  ),
+                  const Align(
+                    alignment: AlignmentDirectional(-1, 0),
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
+                      child: Text('(1: 전혀 아니다, 4: 매우 그렇다)'),
+                    ),
+                  ),
+                  Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(0, 2, 0, 2),
+                      child: RadioGroup<String>.builder(
+                          groupValue: afterPHQ_2,
+                          direction: Axis.horizontal,
+                          onChanged: (value) => setState(() {
+                                afterPHQ_2 = value.toString();
+                                _updateButtonState();
+                              }),
+                          items: const ['1', '2', '3', '4'],
+                          itemBuilder: (item) => RadioButtonBuilder(item))),
+                ],
+              ),
+            ),
             Center(
               child: ElevatedButton(
                 onPressed: isButtenEnabled

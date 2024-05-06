@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'screens/loading_screen.dart';
 
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHanlder(RemoteMessage message) async {
   print("Background message handling...${message.notification!.body}");
 }
@@ -28,7 +29,13 @@ Future<void> _initFirebaseMessaging() async {
       options: const FirebaseOptions(
           apiKey: '', appId: '', messagingSenderId: '', projectId: ''));
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHanlder);
+  FirebaseMessaging.onBackgroundMessage(
+      _firebaseMessagingBackgroundHanlder); // allow message when on background
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    // allow message when on foreground
+    print('Got message whilst in the foreground');
+  });
+
   channel = const AndroidNotificationChannel(
       'diary_channel', 'Test Notification',
       description: 'test', importance: Importance.max);
