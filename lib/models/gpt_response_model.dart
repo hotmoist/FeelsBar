@@ -92,7 +92,7 @@ class GPTResponse {
             .trim()
             .replaceAll(RegExp(r'^"|"$'), '');
       } else {
-        // print('Error: ${response.statusCode} ${response.body}');
+        print('Error: ${response.statusCode} ${response.body}');
         return "Failed to load data from OpenAI";
       }
     } catch (e) {
@@ -102,7 +102,7 @@ class GPTResponse {
 
   Future<String> fetchGPTCommentResponse(String content) async {
     String systemRole =
-        "당신은 사용자가 제공한 일기 내용을 토대로 감정적 지지(emotional support)하는 댓글을 다는 역할이다. 이때 댓글 다는 입장은 자신의 경험을 짧게 이야기 한 후, 감정적 지지하는 말 한마디를 한다. 문장은 2문장을 초과하지 않는다.";
+        "[역할]\n당신은 사용자가 제공한 일기 내용을 토대로 감정적 지지(emotional support)하는 댓글을 다는 역할이다.\n이때 댓글 다는 입장은 자신의 경험을 짧게 이야기 한 후, 감정적 지지하는 말 한마디를 한다.\n[출력 조건]\n문장은 2문장을 초과하지 않는다.\n\'감정적 지지\'라는 단어를 사용하지 않는다.\n사용자를 지칭할 때, \'여러분\'과 같은 복수가 아닌 단수로 언급한다.";
     try {
       final response = await http.post(url,
           headers: {
@@ -131,8 +131,8 @@ class GPTResponse {
             .trim()
             .replaceAll(RegExp(r'^"|"$'), '');
       } else {
-        print('Error: ${response.statusCode} ${response.body}');
-        return "Failed to load data from OpenAI";
+        // print('Error: ${response.statusCode} ${response.body}');
+        return "오류 발생! 해당 페이지 캡쳐 후 버그 레포트 부탁드립니다:\nError: ${response.statusCode} ${response.body}";
       }
     } catch (e) {
       return 'Exception: $e';
