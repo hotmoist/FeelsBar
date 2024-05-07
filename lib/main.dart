@@ -126,7 +126,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(
-            title: const Center(child: Text("Diary")),
+            title: Text("FeelsBar"),
             backgroundColor: const Color(0xFFFEF7FF),
           ),
           body: isDataSaved

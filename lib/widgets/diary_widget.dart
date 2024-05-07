@@ -69,7 +69,9 @@ class _DiaryWidgetState extends State<DiaryWidget> {
 
   void _updateButtonState() {
     setState(() {
-      isButtenEnabled = surveyFiveVal != "-1";
+      isButtenEnabled = (surveyFiveVal != "-1") &&
+          (afterPHQ_1 != "-1") &&
+          (afterPHQ_2 != "-1");
     });
   }
 

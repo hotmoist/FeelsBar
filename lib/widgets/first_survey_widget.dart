@@ -22,7 +22,9 @@ class _FirstSurveySectionWidgetState extends State<FirstSurveySectionWidget> {
 
   void _updateButtonState() {
     setState(() {
-      _isButtonEnabled = surveyOneValue != "-1";
+      _isButtonEnabled = (surveyOneValue != "-1") &&
+          (beforePHQ_1 != "-1") &&
+          (beforePHQ_2 != "-1");
     });
   }
 
